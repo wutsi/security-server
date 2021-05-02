@@ -34,6 +34,7 @@ public class GetControllerTest {
         assertEquals(HttpStatus.OK, response.statusCode)
 
         val apiKey = response.body.apiKey
+        assertNotNull("1", apiKey.id)
         assertNotNull("test", apiKey.name)
         assertEquals(listOf("foo", "bar"), apiKey.scopes)
     }
