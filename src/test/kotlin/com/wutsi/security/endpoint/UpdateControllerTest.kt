@@ -1,11 +1,16 @@
 package com.wutsi.security.endpoint
 
+import com.nhaarman.mockitokotlin2.verify
 import com.wutsi.security.dao.ApiKeyRepository
 import com.wutsi.security.dto.UpdateApiKeyRequest
 import com.wutsi.security.dto.UpdateApiKeyResponse
+import com.wutsi.security.event.ApiKeyEventPayload
+import com.wutsi.security.event.SecurityEventType
+import com.wutsi.stream.EventStream
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.jdbc.Sql
@@ -22,6 +27,9 @@ public class UpdateControllerTest {
 
     @Autowired
     private lateinit var dao: ApiKeyRepository
+
+    @MockBean
+    private lateinit var eventStream: EventStream
 
     private val rest = RestTemplate()
 
@@ -76,5 +84,21 @@ public class UpdateControllerTest {
         } catch (ex: Exception) {
             fail()
         }
+    }
+
+    @Test
+    public fun `update key fire event`() {
+        val url = "http://localhost:$port/v1/api-keys/1"
+        val request = UpdateApiKeyRequest(
+            scopes = listOf("yo", "man", "how"),
+            name = "TxT"
+        )
+
+        rest.postForEntity(url, request, UpdateApiKeyResponse::class.java)
+
+        verify(eventStream).publish(
+            SecurityEventType.APIKEY_UPDATED.urn,
+            ApiKeyEventPayload("1")
+        )
     }
 }

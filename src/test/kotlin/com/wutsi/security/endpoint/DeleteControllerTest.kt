@@ -1,9 +1,14 @@
 package com.wutsi.security.endpoint
 
+import com.nhaarman.mockitokotlin2.verify
 import com.wutsi.security.dao.ApiKeyRepository
+import com.wutsi.security.event.ApiKeyEventPayload
+import com.wutsi.security.event.SecurityEventType
+import com.wutsi.stream.EventStream
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.web.client.RestTemplate
@@ -19,6 +24,9 @@ public class DeleteControllerTest {
 
     @Autowired
     private lateinit var dao: ApiKeyRepository
+
+    @MockBean
+    private lateinit var eventStream: EventStream
 
     private val rest = RestTemplate()
 
@@ -60,5 +68,17 @@ public class DeleteControllerTest {
     public fun `nothing when invalid key`() {
         val url = "http://localhost:$port/v1/api-keys/9999"
         rest.delete(url)
+    }
+
+    @Test
+    public fun `delete key fire event`() {
+        val url = "http://localhost:$port/v1/api-keys/4"
+
+        rest.delete(url)
+
+        verify(eventStream).publish(
+            SecurityEventType.APIKEY_DELETED.urn,
+            ApiKeyEventPayload("4")
+        )
     }
 }

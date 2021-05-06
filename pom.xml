@@ -36,6 +36,7 @@
     <hikari-cp.version>4.0.3</hikari-cp.version>
     <postgresql.version>42.2.20</postgresql.version>
     <flyway.version>7.8.2</flyway.version>
+    <wutsi-security-sdk.version>1.2.1</wutsi-security-sdk.version>
     <wutsi-spring-memcached.version>1.1.0</wutsi-spring-memcached.version>
     <wutsi-stream-rabbitmq.version>1.7.0</wutsi-stream-rabbitmq.version>
     <wutsi-tracing.version>1.4.0</wutsi-tracing.version>
@@ -46,6 +47,11 @@
       <groupId>com.wutsi.tracing</groupId>
       <artifactId>wutsi-tracing</artifactId>
       <version>${wutsi-tracing.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.wutsi.security</groupId>
+      <artifactId>security-sdk-kotlin</artifactId>
+      <version>${wutsi-security-sdk.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
